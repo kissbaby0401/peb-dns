@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        操作记录：
+        <!--<small>Preview</small>-->
+      </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="example1" class="table table-bordered table-hover table-striped">
+                <thead>
+                <tr>
+                    <!--<th></th>-->
+                    <th>操作时间</th>
+                    <th>操作类型</th>
+                    <th>操作对象</th>
+                    <th>对象名称</th>
+                    <th>对象ID</th>
+                    <th>操作者</th>
+                    <th>对象详情</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+                <!--<tfoot>
+                </tfoot>-->
+                </table>
+            </div>
+            <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+    </section>
+</div>
+{% endblock %}
+
+
+{% block modal %}
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+  var table = $("#example1").DataTable({
+      "bAutoWidth": true, //自动宽度
+      "processing": true,
+      "serverSide": true,
+      "ajax": "{{ url_for('dns.logs_api') }}",
+      "language": {
+          "sProcessing":   "处理中...",
+          "sLengthMenu":   "显示 _MENU_ 项结果",
+          "sZeroRecords":  "没有匹配结果",
+          "sInfo":         "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+          "sInfoEmpty":    "显示第 0 至 0 项结果，共 0 项",
+          "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+          "sInfoPostFix":  "",
+          "sSearch":       "搜索:",
+          "sUrl":          "",
+          "sEmptyTable":     "表中数据为空",
+          "sLoadingRecords": "载入中...",
+          "sInfoThousands":  ",",
+          "oPaginate": {
+              "sFirst":    "首页",
+              "sPrevious": "上页",
+              "sNext":     "下页",
+              "sLast":     "末页"
+          },
+          "oAria": {
+              "sSortAscending":  ": 以升序排列此列",
+              "sSortDescending": ": 以降序排列此列"
+          }
+      },
+      responsive: true,
+      "order": [[ 0, "desc" ]],
+      columnDefs: [
+          {
+              targets: -1,
+              render: function ( data, type, row, meta ) {
+                  if(type === 'display'){
+                    // console.log(row[0])
+                    data = "<textarea class=\"textarea\" rows=\"3\" cols=\"39\" readonly>" + data + "</textarea>"
+                    // {% if current_user.admin == 2 %}
+                    // data = '<a recordID=' + row[0] + ' onclick="updateRecord(this)" class="btn btn-link">编辑</a> | <button type="button" recordID=' + row[0] + ' onclick="delRecord(this)"  class="btn btn-link"><span class="label label-danger"><u>删除</u></span></button>'
+                    // {% elif current_user.admin == 1 %}
+                    // data = '<a recordID=' + row[0] + ' onclick="updateRecord(this)" class="btn btn-link">编辑</a>'
+                    // {% elif current_user.admin == 0 %}
+                    // data = ''
+                    // {% endif %}
+                    //   // data = '<a href="basic.php?game=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    // console.log(data)
+                  }
+
+                  return data;
+              }
+          }
+      ],
+
+  });
+</script>
+{% endblock %}

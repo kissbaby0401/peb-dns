@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/dist/css/jquery-confirm.css">
+<link rel="stylesheet" href="/static/dist/css/view/view.css">
+<div class="content-wrapper">
+  <section class="content">
+
+    {% for msg in get_flashed_messages() %}
+    <div class="alert alert-success alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <h4><i class="icon fa fa-check"></i> 创建成功！</h4>
+      {{ msg }}
+    </div>
+    {% endfor %}
+
+    {% if current_user.admin > 0 %}
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-primary">
+          <div class="box-header">
+            <h3 class="box-title"> 操作：</h3>
+          </div>
+          <div class="box-body">
+            <div class="margin">
+              <div class="btn-group">
+                <button id="create" type="button" style="height:36px;width:230px" class="btn btn-block btn-primary" data-toggle="modal" data-target="#myModal">添加</button>
+
+                <button id="create2" type="button" style="height:36px;width:230px;margin-top:0;margin-left: 50px;" class="btn btn-block btn-primary" data-toggle="modal" data-target="#myModal2">编辑BIND主配置文件</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <!-- left column -->
+      <div class="col-md-12">
+        <div class="box box-primary">
+          <div class="box-header">
+            <h3 class="box-title"> Server列表：</h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body table-responsive no-padding">
+            <table class="table table-hover">
+              <tr>
+                <th>#</th>
+                <th>Host</th>
+                <th>IP地址</th>
+                <th>环境</th>
+                <th>DNS类型</th>
+                <th>当前状态</th>
+                <th>操作</th>
+              </tr>
+              {% for view in servers %}
+              <tr>
+                <td>{{view.id}}</td>
+                <td>{{view.host}}</td>
+                <td>{{view.ip}}</td>
+                <td>{{view.env}}</td>
+                <td>{{view.dns_type}}</td>
+                <td>{{view.status}}</td>
+                <td>
+                  {% if current_user.admin == 2 %}
+                  <a data-id="{{view.id}}" class="btn btn-link edit" data-toggle="modal" data-target="#myModal"
+                      data-host="{{view.host}}" data-ip="{{view.ip}}" data-env="{{ view.env }}"  data-type="{{ view.dns_type }}">编辑</a>
+                  | <button type="button" data-id="{{view.id}}" class="btn btn-link del"><span class="label label-danger" ><u>删除</u></span></button>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+          <!-- /.box-body -->
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+</div>
+{% endblock %}
+
+
+{% block modal %}
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">创建记录</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>主机名</label>
+          <input type="text" class="form-control" id="s_host">
+        </div>
+        <div class="form-group">
+          <label>IP地址</label>
+          <input type="text" class="form-control" id="s_ip">
+        </div>
+        <div class="form-group">
+          <label>环境</label>
+            <select id="s_env" class="form-control">
+                <option value="dev">dev</option>
+                <option value="anhouse">anhouse</option>
+                <option value="ga">ga</option>
+            </select>
+        </div>
+        <div class="form-group">
+          <label>DNS类型</label>
+            <select id="s_type" class="form-control">
+                <option value="master">master</option>
+                <option value="salve">salve</option>
+            </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="sub">提交</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel2">BIND主配置文件</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <table border="0" cellspacing="0" cellpadding="0" style="position:relative;width:100%">
+            <tr>
+              <td>
+                <div id="ol"><textarea cols="2" rows="10" id="li" disabled></textarea></div>
+                <textarea name="co" cols="60" rows="10" wrap="off" id="c2" onblur="check('2')" onkeyup="keyUp()" onFocus="clearValue('2')" onscroll="G('li').scrollTop = this.scrollTop;" oncontextmenu="return false" class="grey"></textarea>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="sub2">提交</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/dist/js/jquery-confirm.js"></script>
+<script src="/static/dist/js/text-config.js"></script>
+<script src="/static/dist/js/servers.js"></script>
+{% endblock %}
+

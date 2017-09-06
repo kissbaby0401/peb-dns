@@ -1,0 +1,185 @@
+<link href="<%=basePath %>bootstrap/css/bootstrap-datetimepicker.min.css" rel="external nofollow" rel="stylesheet" media="screen">
+
+<script src="<%=basePath %>bootstrap/js/bootstrapValidator.min.js"></script> 
+<script src="<%=basePath %>bootstrap/js/bootstrapValidator.zh_CN.js"></script> 
+bootstrapvalidator源码：https://github.com/nghuuphuoc/bootstrapvalidator
+boostrapvalidator api：http://bv.doc.javake.cn/api/
+
+
+<div class="modal fade" id="myModal_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"> 
+  <div class="modal-dialog" role="document"> 
+   <div class="modal-content"> 
+    <div class="modal-header"> 
+     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button> 
+     <h4 class="modal-title" id="myModalLabel_add">新增</h4> 
+    </div> 
+    <div class="modal-body" style="height:680px;"> 
+      <form id="defaultForm" class="form-horizontal"> 
+       <div class="form-group"> 
+        <label class="col-sm-2 control-label" for="company_name">公司名称</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="company_name" type="text" placeholder="请输入公司名称" name="company_name"/> 
+        </div> 
+        <label class="col-sm-2 control-label" for="company_id">公司id</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="company_id" type="text" placeholder="请输入公司id" name="company_id"/> 
+        </div> 
+       </div> 
+       <div class="form-group"> 
+        <label class="col-sm-2 control-label" for="computer_room">机房</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="computer_room" type="text" placeholder="请输入机房"/> 
+        </div> 
+        <label class="col-sm-2 control-label" for="cabinet">机柜</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="cabinet" type="text" placeholder="请输入机柜"/> 
+        </div> 
+       </div> 
+       <div class="form-group"> 
+        <label class="col-sm-2 control-label" for="equipment_type">设备类型</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="equipment_type" type="text" placeholder="请输入设备类型"/> 
+        </div> 
+        <label class="col-sm-2 control-label" for="equipment_name">设备名称</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="equipment_name" type="text" placeholder="请输入设备名称"/> 
+        </div> 
+       </div> 
+       <div class="form-group"> 
+        <label class="col-sm-2 control-label" for="equipment_ip">设备ip</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="equipment_ip" type="text" placeholder="请输入设备ip" name="equipment_ip" /> 
+        </div> 
+        <label class="col-sm-2 control-label" for="equipment_brand">设备品牌</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="equipment_brand" type="text" placeholder="请输入设备品牌"/> 
+        </div> 
+       </div> 
+       <div class="form-group"> 
+        <label class="col-sm-2 control-label" for="equipment_model">设备型号</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="equipment_model" type="text" placeholder="请输入设备型号"/> 
+        </div> 
+        <label class="col-sm-2 control-label" for="shelf_position">上架位置</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="shelf_position" type="text" placeholder="请输入上架位置"/> 
+        </div> 
+       </div> 
+       <div class="form-group"> 
+        <label class="col-sm-2 control-label" for="equipment_sn">设备SN号</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="equipment_sn" type="text" placeholder="请输入设备SN号"/> 
+        </div> 
+        <label class="col-sm-2 control-label" for="equipment_pn">设备PN号</label> 
+        <div class="col-sm-4"> 
+         <input class="form-control" id="equipment_pn" type="text" placeholder="请输入设备PN号"/> 
+        </div> 
+       </div> 
+      </form> 
+      </div> 
+     <div class="modol-footer" id="button_sub"> 
+      <button type="reset" id="btn_reset" class="btn btn-default"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>重置</button> 
+      <button type="button" id="" name="submit" class="btn btn-primary submit_review"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>提交审核</button> 
+     </div> 
+   </div> 
+  </div> 
+ </div>
+
+
+$(function(){/* 文档加载，执行一个函数*/
+// $(".submit_review").attr({"disabled":"disabled"}); 
+ $('#defaultForm').bootstrapValidator({ 
+    message: 'This value is not valid', 
+    feedbackIcons: {/*输入框不同状态，显示图片的样式*/
+     valid: 'glyphicon glyphicon-ok', 
+     invalid: 'glyphicon glyphicon-remove', 
+     validating: 'glyphicon glyphicon-refresh'
+    }, 
+    fields: {/*验证*/
+     company_name: {/*键名username和input name值对应*/
+      validators: { 
+       notEmpty: {/*非空提示*/
+        message: '公司名称不能为空'
+       }, 
+//       stringLength: {/*长度提示*/ 
+//        min: 6, 
+//        max: 30, 
+//        message: '用户名在6到30之间' 
+//       }/*最后一个没有逗号*/ 
+      } 
+     }, 
+     company_id: { 
+      validators: { 
+       notEmpty: { 
+        message: '公司ID不能为空'
+       }, 
+      } 
+     }, 
+     equipment_ip: { 
+      validators: { 
+       notEmpty: { 
+        message: '设备IP不能为空'
+       }, 
+       regexp: { 
+        regexp: /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/, 
+        message: '设备IP不合法'
+         } 
+      } 
+     }, 
+    } 
+  }) 
+ });
+
+
+
+
+$("#btn_reset").click(function(event) { 
+  /* Act on the event */
+  $('#defaultForm').data('bootstrapValidator').resetForm(true); 
+ }); 
+ $("body").on('click', '#btn_submit_add', function(event) { 
+  /* Act on the event */
+  $('#defaultForm').bootstrapValidator('validate'); 
+  var flag = $("#defaultForm").data('bootstrapValidator').isValid(); 
+  if (!flag) { 
+   toastr.error("填写有误，请重新填写！"); 
+  } else { 
+   $.post('addEquipmentInfoCheck.action', { 
+    "equipmentInfoCheck.companyId": $("#company_id").val(), 
+    "equipmentInfoCheck.companyName": $("#company_name").val(), 
+    "equipmentInfoCheck.machineRoom": $("#computer_room").val(), 
+    "equipmentInfoCheck.equipmentCabinet": $("#cabinet").val(), 
+    "equipmentInfoCheck.deviceType": $("#equipment_type").val(), 
+    "equipmentInfoCheck.deviceName": $("#equipment_name").val(), 
+    "equipmentInfoCheck.deviceIp": $("#equipment_ip").val(), 
+    "equipmentInfoCheck.deviceBrand": $("#equipment_brand").val(), 
+    "equipmentInfoCheck.deviceModel": $("#equipment_model").val(), 
+    "equipmentInfoCheck.position": $("#shelf_position").val(), 
+    "equipmentInfoCheck.deviceSn": $("#equipment_sn").val(), 
+    "equipmentInfoCheck.devicePn": $("#equipment_pn").val(), 
+    "equipmentInfoCheck.state":1 
+   }, function(data, textStatus, xhr) { 
+    /*optional stuff to do after success */
+    if (textStatus == "success") { 
+     // e.preventDefault(); 
+     $('#defaultForm').data('bootstrapValidator').resetForm(true); 
+     $("#myModal_add").modal('hide'); 
+     toastr.success("提交成功"); 
+    }else{ 
+     $("#myModal_add").modal('hide'); 
+     toastr.error("提交失败"); 
+    } 
+   }); 
+  } 
+ });
+
+
+
+$("#equipment_ip").blur(function(){ 
+ var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/ ;  
+ var flag=reg.test($(this).val()); 
+ if(!flag){ 
+ toastr.error("IP不合法，请重新输入"); 
+ $(this).val(""); 
+ } 
+);

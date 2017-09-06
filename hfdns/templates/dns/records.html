@@ -1,0 +1,471 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+<!--<link rel="stylesheet" href="/static/dist/css/select2.min.css">-->
+<link rel="stylesheet" href="/static/dist/css/jquery-confirm.css">
+<link rel="stylesheet" href="/static/dist/css/records/records.css">
+<div class="content-wrapper">
+  {% if current_zone.z_type != "forward only" %}
+  <section class="content">
+
+    {% for msg in get_flashed_messages() %}
+    <div class="alert alert-success alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <h4><i class="icon fa fa-check"></i> 创建成功！</h4>
+      {{ msg }}
+    </div>
+    {% endfor %}
+
+
+    {% if current_user.admin > 0 %}
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-primary">
+          <div class="box-header">
+            <h3 class="box-title"> 操作：</h3>
+          </div>
+          <div class="box-body">
+            <div class="margin">
+              <div class="btn-group">
+                <button id="create" type="button" data-toggle="modal" data-target="#myModal" style="height:36px;width:230px" class="btn btn-block btn-primary">添加</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-primary">
+          <div class="box-header">
+            <h3 class="box-title"> {{ request.path.split('/')[-1].replace('_', '.') }}  ：</h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <table id="records_list" class="table table-bordered table-hover table-striped">
+              <thead>
+              <tr>
+                <!--<th></th>-->
+                <th>ID</th>
+                <th>主机记录</th>
+                <th>记录类型</th>
+                <th>记录值</th>
+                <th>TTL</th>
+                <th>线路类型</th>
+                <th>备注</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+              </thead>
+              <tbody>
+              </tbody>
+              <!--<tfoot>
+              </tfoot>-->
+            </table>
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>
+
+    <!-- /.row -->
+  </section>
+  {% else %}
+  <section class="content">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-primary">
+          <div class="box-header">
+            <h3 class="box-title"> Forward类型域名：</h3>
+          </div>
+          <div class="box-body">
+            <div class="margin">
+              当前域名为 <b>Forward类型</b> 域名， 已被forward至 <b>{{ current_zone.forwarders }}</b>  解析 ！！
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
+
+
+{% block modal %}
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">创建记录：</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+              <label>主机记录</label>
+              <input type="text" class="form-control" id="host">
+            </div>
+            <div class="form-group">
+              <label>类型</label>
+              <p>
+                <select class="form-control" id="type">
+                    {% for  r_type in  selections.get('r_type')  %}
+                    <option value="{{ r_type }}">{{ r_type }}</option>
+                    {% endfor %}
+                </select>
+              </p>
+              <!--<input type="text" class="js-data-example-ajax form-control" />-->
+            </div>
+            <div class="form-group">
+              <label>记录值</label>
+              <input type="text" class="form-control" id="record-val">
+            </div>
+            <div class="form-group">
+              <label>TTL</label>
+                <select class="form-control" id="ttl">
+                    {% for  r_ttl in  selections.get('r_ttl')  %}
+                    <option value="{{ r_ttl }}">{{ r_ttl }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+              <label>线路类型</label>
+                <div id="select-line">
+
+                </div>
+                <!--<select class="form-control select2">-->
+                    <!--{% for  r_line in  selections.get('r_line')  %}-->
+                    <!--<option value="{{ r_line }}">{{ r_line }}</option>-->
+                    <!--{% endfor %}-->
+                <!--</select>-->
+            </div>
+            <div class="form-group">
+              <label>备注</label>
+              <input type="text" class="form-control" id="other">
+            </div>
+        </div>
+        <div class="ajax-error hide">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="sub">提交</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div id="r_line" style="display : none">
+    <p>default</p>
+    {% for  r_line in selections.get('r_line')  %}
+    <p>{{ r_line }}</p>
+    {% endfor %}
+</div>
+
+<p class="error-modal hide"></p>
+<p class="success-modal hide"></p>
+
+<!--<div class="confirm-error hide">-->
+    <!--<p class="title">确定删除吗</p>-->
+    <!--<div class="bt">-->
+        <!--<button class="cancel">取消</button>-->
+        <!--<button class="sure">确定</button>-->
+    <!--</div>-->
+<!--</div>-->
+
+
+
+<!--<div class="modal" id="create_modal">-->
+  <!--<div class="modal-dialog">-->
+    <!--<div class="modal-content">-->
+      <!--<div class="modal-header">-->
+        <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+          <!--<span aria-hidden="true">&times;</span></button>-->
+        <!--<h4 id="modal_title" class="modal-title">创建记录：</h4>-->
+      <!--</div>-->
+      <!--<div class="modal-body">-->
+        <!--<form id="create_form" class="form-horizontal" role="form" onsubmit="return submitHandler()" method="POST">-->
+          <!--<div class="box-body">-->
+            <!--<div class="form-group">-->
+                <!--<label for="r_host">主机记录</label>-->
+                <!--<div class="col-xs-12">-->
+                    <!--<input type="text" class="form-control" id="r_host" name="r_host" placeholder="主机" required>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<label for="r_type">记录类型</label>-->
+                <!--<div class="col-xs-12">-->
+                    <!--<select class="form-control select2" id="r_type" name="r_type" style="width: 100%;" data-type="r_type" data-placeholder="请选择记录类型" required>-->
+                    <!--</select>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<label for="r_value">记录值</label>-->
+                <!--<div class="col-xs-12">-->
+                    <!--<input type="text" class="form-control" id="r_value" name="r_value" placeholder="记录值" required>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<label for="r_ttl">TTL</label>-->
+                <!--<div class="col-xs-12">-->
+                    <!--<select class="form-control select2" id="r_ttl" name="r_ttl" style="width: 100%;" data-type="r_ttl" data-placeholder="请选择TTL" required>-->
+                    <!--</select>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<label for="r_line">线路类型</label>-->
+                <!--<div class="col-xs-12">-->
+                    <!--<select class="form-control select2" id="r_line" name="r_line" style="width: 100%;" data-type="r_line" data-placeholder="请选择线路类型" required>-->
+                    <!--</select>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<label for="r_comment">备注</label>-->
+                <!--<div class="col-xs-12">-->
+                    <!--<input type="text" class="form-control" id="r_comment"  name="r_comment"  placeholder="备注" required>-->
+                <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</form>-->
+      <!--</div>-->
+      <!--<div class="modal-footer">-->
+        <!--<button class="btn btn-default pull-left" data-dismiss="modal" onclick="clearForm(create_form)">关闭</button>-->
+        <!--<button id="btn-submit" class="btn btn-primary">提交</button>-->
+      <!--</div>-->
+    <!--</div>-->
+    <!--&lt;!&ndash; /.modal-content &ndash;&gt;-->
+  <!--</div>-->
+  <!--&lt;!&ndash; /.modal-dialog &ndash;&gt;-->
+<!--</div>-->
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="/static/dist/js/common.js"></script>
+<script src="/static/dist/js/jquery-confirm.js"></script>
+<script>
+var rows = []
+var table = $("#records_list").DataTable({
+    "bAutoWidth": true, //自动宽度
+    "processing": true,
+    "serverSide": true,
+    "ajax": "{{ url_for('dns.tables_record', group=request.path.split('/')[-2] ,zone=request.path.split('/')[-1].replace('.', '_')) }}",
+    "language": {
+        "sProcessing":   "处理中...",
+        "sLengthMenu":   "显示 _MENU_ 项结果",
+        "sZeroRecords":  "没有匹配结果",
+        "sInfo":         "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+        "sInfoEmpty":    "显示第 0 至 0 项结果，共 0 项",
+        "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+        "sInfoPostFix":  "",
+        "sSearch":       "搜索:",
+        "sUrl":          "",
+        "sEmptyTable":     "表中数据为空",
+        "sLoadingRecords": "载入中...",
+        "sInfoThousands":  ",",
+        "oPaginate": {
+            "sFirst":    "首页",
+            "sPrevious": "上页",
+            "sNext":     "下页",
+            "sLast":     "末页"
+        },
+        "oAria": {
+            "sSortAscending":  ": 以升序排列此列",
+            "sSortDescending": ": 以降序排列此列"
+        }
+    },
+    responsive: true,
+    "order": [[ 0, "desc" ]],
+    columnDefs: [
+        {
+            targets: 7,
+            render: function ( data, type, row, meta ) {
+                if(type === 'display'){
+                if (data === null || data === 'ON'){
+                    data = '<span class="badge bg-green">' + 'ON' + '</span>';
+                }else{
+                    data = '<span class="badge bg-red">' + data + '</span>';
+                }
+                    
+                // console.log(data)
+                }
+
+                return data;
+            }
+        },
+        {
+            targets: 8,
+            render: function ( data, type, row, meta ) {
+                if(type === 'display'){
+                // console.log(row[0])
+                {% if current_user.admin == 2 %}
+                data = '<a data-id=' + row[0]+ ' data-record="'+ row[3] +'" data-host="'+ row[1] +'"  data-recordtype="' + row[2] +'" ' +
+                                'data-ttl="' + row[4] + '" data-line="' + row[5] + '" data-other="' + row[6] + '"'+
+                        'href="javascript:;" class="btn btn-link edit"  data-toggle="modal" data-target="#myModal">编辑</a> | <button type="button" data-id="' + row[0] + '"  class="btn btn-link del"><span class="label label-danger"><u>删除</u></span></button>'
+                {% elif current_user.admin == 1 %}
+                data =  '<a data-id=' + row[0]+ ' data-record="'+ row[3] +'" data-host="'+ row[1] +'"  data-recordtype="' + row[2] +'" ' +
+                        'data-ttl="' + row[4] + '" data-line="' + row[5] + '" data-other="' + row[6] + '"'+
+                        'href="javascript:;" class="btn btn-link edit"  data-toggle="modal" data-target="#myModal">编辑</a>'
+                {% elif current_user.admin == 0 %}
+                data = ''
+                {% endif %}
+
+                if (row[1] == '@'){
+                  data = '';
+                }
+                    // data = '<a href="basic.php?game=' + encodeURIComponent(data) + '">' + data + '</a>';
+                // console.log(data)
+                }
+
+                return data;
+            }
+        }
+    ],
+});
+//
+//var action = 'create';
+//var record_id = null;
+//
+//$('#create').on('click', function () {
+//    $('#create_modal').modal({backdrop: 'static', keyboard: false});
+//});
+//
+//var url_zone = window.location.pathname;
+//// console.log(url_zone.split('/').pop())
+///* 初始化表单 start*/
+//$('#create_form').find('.select2').each(function(index,element){
+//    var $this = $(this), sParams = {};
+//    sParams = {
+//        type: "POST",
+//        url: "/dns/api/inner_selections",
+//        dataType: 'json',
+//        param : {
+//            'info_type': $this.data('type'),
+//            'zone': url_zone.split('/').pop()
+//        }
+//    };
+//    initSelect($this,sParams);
+//});
+//
+//
+////重置表单
+//function clearForm(form) {
+//// 迭代input清空
+//    $(':input', form).each(function() {
+//        var type = this.type;
+//        var tag = this.tagName.toLowerCase(); // normalize case
+//        if (type == 'text' || type == 'password' || tag == 'textarea')
+//        if (this.readOnly !== true){
+//            this.value = "";
+//        }
+//
+//        // 跌代多选checkboxes
+//        else if (type == 'checkbox' || type == 'radio')
+//        this.checked = false;
+//        // select 迭代下拉框
+//        else if (tag == 'select')
+//        this.selectedIndex = -1;
+//    });
+//    // $('#create_form').data("bootstrapValidator").resetForm();
+//    // $('#create_form').reset();
+//    // $("#r_type").val("").select2();
+//    // $("#r_ttl").val("").select2();
+//    // $("#r_line").val("").select2();
+//
+//};
+//
+//
+//function updateRecord(e){
+//var recordID = e.getAttribute("recordID");
+//// var data = table.row( 0 ).data();
+//// console.log(data)
+//// console.log(e)
+//
+//$('#records_list tbody').on( 'click', 'a', function () {
+//    action = 'modify';
+//
+//    var data = table.row( $(this).parents('tr') ).data();
+//    record_id = data[0];
+//    $('#modal_title').text('修改记录 [' + data[0] + ']:');
+//    $('#r_host').val(data[1]);
+//    $('#r_type').val(data[2]).select2();
+//    $('#r_value').val(data[3]);
+//    $('#r_ttl').val(data[4]).select2();
+//    $('#r_line').val(data[5]).select2();
+//    $('#r_comment').val(data[6]);
+//    $('#create_modal').modal({backdrop: 'static', keyboard: false});
+//    // alert( data[0] +"'s salary is: "+ data[ 5 ] );
+//});
+//
+//}
+//
+//var ajaxAtatus = false;
+//
+//$('#btn-submit').on('click',function(){
+//    var $this = $(this),
+//        $form = $('#create_form'),
+//        params = $form.parseForm()
+//        url = '';
+//
+//    $form.bootstrapValidator();
+//    var formvalid = $form.data('bootstrapValidator');
+//    formvalid.validate();
+//
+//    params.zone_type = url_zone.split('/')[2]
+//    params.zone_name = url_zone.split('/').pop().replace('_', '.')
+//    if( !formvalid.isValid() ){
+//        $this.addClass('btn-disabled');
+//    }else{
+//        $this.removeClass('btn-disabled');
+//        switch(action){
+//            case 'create':
+//                url= url_zone;
+//                params.action = "create";
+//                break;
+//            case 'modify':
+//                url= url_zone;
+//                params.action = "modify";
+//                break;
+//        }
+//
+//        // console.log(params)
+//        $.ajax({
+//            url: url,
+//            type: 'POST',
+//            dataType: 'json',
+//            data: JSON.stringify(params),
+//            contentType: "application/json"
+//        })
+//        .done(function(data) {
+//            ajaxAtatus = true;
+//            $('#create_modal').modal('toggle');
+//            $.alert({
+//                title: ' 创建成功',
+//                content: '创建成功！',
+//                type: 'green',
+//            });
+//        })
+//        .fail(function(data) {
+//            ajaxAtatus = false;
+//            $.alert({
+//                title: ' 创建失败！',
+//                content: '创建失败！',
+//                type: 'red',
+//            });
+//        });
+//
+//    }
+//});
+</script>
+<!--<script src="/static/dist/js/select2.full.min.js"></script>-->
+<!--<script src="/static/dist/js/jquery-confirm.js"></script>-->
+<script src="/static/dist/js/records.js"></script>
+{% endblock %}
+

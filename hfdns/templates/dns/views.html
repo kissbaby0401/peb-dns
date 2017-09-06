@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block stylesheets %}
+<!-- DataTables -->
+<link href="/static/plugins/select2/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="/static/plugins/datatables/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/static/dist/css/pages/asset/common.css">
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/dist/css/jquery-confirm.css">
+<link rel="stylesheet" href="/static/dist/css/view/view.css">
+<div class="content-wrapper">
+  
+    <!-- Main content -->
+    <section class="content">
+
+      {% if current_user.admin > 0 %}
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="box box-primary">
+            <div class="box-header">
+              <h3 class="box-title"> 操作：</h3>
+            </div>
+            <div class="box-body">
+              <div class="margin">
+                <div class="btn-group">
+                  <button id="create" type="button" style="height:36px;width:230px" class="btn btn-block btn-primary"  data-toggle="modal" data-target="#myModal">添加</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+          <div class="box box-primary">
+            <div class="box-header">
+              <h3 class="box-title"> View列表：</h3>
+
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              <table class="table table-hover">
+                
+                <tr>
+                  <th>#</th>
+                  <th>View名称</th>
+                  <th>区域配置（ACL）</th>
+                  <th>操作</th>
+                </tr>
+                {% for view in views %}
+                <tr>
+                  <td>{{ view.id }}</td>
+                  <td>{{ view.name }}</td>
+                  <td>
+                    <textarea rows="3" disabled>{{ view.data }}</textarea>
+                  </td>
+                  <td>
+                    {% if current_user.admin == 2 %}
+                    <a data-id="{{view.id}}" class="btn btn-link edit" data-toggle="modal" data-target="#myModal"
+                        data-name="{{view.name}}" data-data="{{ view.data }}">编辑</a>
+                    | <button type="button" data-id="{{view.id}}" class="btn btn-link del"><span class="label label-danger" ><u>删除</u></span></button>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+
+        </div>
+      </div>
+      <!-- /.row -->
+
+
+
+    </section>
+
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">创建记录</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>区域名称</label>
+          <input type="text" class="form-control" id="v_name">
+        </div>
+        <div class="form-group">
+          <label>区域配置</label>
+          <table border="0" cellspacing="0" cellpadding="0" style="position:relative;width:100%">
+            <tr>
+              <td>
+                <div id="ol"><textarea cols="2" rows="10" id="li" disabled></textarea></div>
+                <textarea name="co" cols="60" rows="10" wrap="off" id="c2" onblur="check('2')" onkeyup="keyUp()" onFocus="clearValue('2')" onscroll="G('li').scrollTop = this.scrollTop;" oncontextmenu="return false" class="grey"></textarea>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!--<div class="form-group">-->
+          <!--<label>BIND总配置文件(name.conf)</label>-->
+          <!--<table border="0" cellspacing="0" cellpadding="0" style="position:relative;width:100%">-->
+            <!--<tr>-->
+              <!--<td>-->
+                <!--<div id="o2"><textarea cols="2" rows="10" id="li2" disabled></textarea></div>-->
+                <!--<textarea name="co" cols="60" rows="10" wrap="off" id="c5" onblur="check2('5')" onkeyup="keyUp2()" onFocus="clearValue2('5')" onscroll="G2('li2').scrollTop = this.scrollTop;" oncontextmenu="return false" class="grey"></textarea>-->
+              <!--</td>-->
+            <!--</tr>-->
+          <!--</table>-->
+        <!--</div>-->
+
+      </div>
+      <div class="ajax-error hide">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="sub">提交</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Select2 -->
+<script src="/static/plugins/select2/select2.full.min.js"></script>
+<script src="/static/plugins/select2/i18n/zh-CN.js"></script>
+<!-- dataTables -->
+<script src="/static/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/datatables/dataTables.bootstrap.min.js"></script>
+<script src="/static/dist/js/common.js"></script>
+<script src="/static/dist/js/jquery-confirm.js"></script>
+<script src="/static/dist/js/text-config.js"></script>
+<!--<script src="/static/dist/js/text-config2.js"></script>-->
+
+<!--<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>-->
+<script>
+//    initMap();//创建和初始化地图
+
+//    $('#tree1').tree({
+//      onClick: function(node){
+//        if (node.children==null || node.children==undefined){
+//          var url="../hub/config/configRead?"+'ip='+ip+'&port='+port+"&file="+node.id;
+//          var str=node.id;
+//          fileType = str.substring(str.lastIndexOf(".")+1,str.length);
+//          fileType=fileType.toLowerCase();
+//          $.get(url,{},function(data,textStatus){
+//                    //因为需要多次语法着色，而且每次选中的文件都不一样，
+//
+//                    //所以每次都要删除原来的pre元素，并新增pre，且syntax得根据文件名的后缀来动态得到。
+//
+//                    //注意：不要直接定位pre，因为每次渲染后pre元素会消失，所以我这里用一个div来放pre，每次清理pre只要删除div下的所有元素就行了
+//                    $("#div_configXML *").remove();
+//                    var $pre=$("<pre id='configXML' class='syntax "+fileType+"'> </pre>");
+//                    $("#div_configXML").append($pre);
+//                    $("#configXML").text(data);
+//                    $.syntax();
+//                  }
+//          );
+//        }
+//      }
+//
+//    });
+
+//  $(".grey").on('focus',function () {
+//      $(this).val('')
+//  })
+</script>
+<script src="/static/dist/js/view.js"></script>
+{% endblock %}
+
+

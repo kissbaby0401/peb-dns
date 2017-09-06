@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/dist/css/zone/zone.css">
+<link rel="stylesheet" href="/static/dist/css/jquery-confirm.css">
+<link rel="stylesheet" href="/static/dist/css/view/view.css">
+<div class="content-wrapper">
+  <section class="content">
+
+    {% for msg in get_flashed_messages() %}
+    <div class="alert alert-success alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <h4><i class="icon fa fa-check"></i> 创建成功！</h4>
+      {{ msg }}
+    </div>
+    {% endfor %}
+
+    {% if current_user.admin > 0 %}
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-primary">
+          <div class="box-header">
+            <h3 class="box-title"> 操作：</h3>
+          </div>
+          <div class="box-body">
+            <div class="margin">
+              <div class="btn-group">
+                <button id="create" type="button" style="height:36px;width:230px" class="btn btn-block btn-primary"  data-toggle="modal" data-target="#myModal">添加</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-primary">
+          <div class="box-header">
+            <h3 class="box-title"> Zone列表：</h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <table id="zone_list" class="table table-bordered table-hover table-striped">
+              <thead>
+              <tr>
+                <!--<th></th>-->
+                <th>ID</th>
+                <th>ZONE</th>
+                <th>域名归类</th>
+                <th>域名类别</th>
+                <th>关联区域</th>
+                <th>转发域名IP地址</th>
+                <th>操作</th>
+              </tr>
+              </thead>
+              <tbody>
+              </tbody>
+              <!--<tfoot>
+              </tfoot>-->
+            </table>
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>
+
+    <!-- /.row -->
+  </section>
+</div>
+{% endblock %}
+
+
+{% block modal %}
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">创建Zone</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>域名</label>
+          <input type="text" class="form-control" id="z_name">
+        </div>
+        <div class="form-group">
+          <label>关联区域</label>
+          <div id="connect-area">
+
+          </div>
+        </div>
+        <div class="form-group">
+          <label>域名类别</label>
+          <input type="text" class="form-control hide" id="edit_type" readonly>
+          <select class="form-control" id="z_type">
+            <option value="master">主域名</option>
+            <option value="forward only">转发域名</option>
+          </select>
+        </div>
+
+        <div class="form-group hide" id="z_forwarders">
+          <label>转发域名IP地址</label>
+          <table border="0" cellspacing="0" cellpadding="0" style="position:relative;width:100%">
+            <tr>
+              <td>
+                <div id="ol"><textarea cols="2" rows="10" id="li" disabled style="height: 200px;"></textarea></div>
+                <textarea name="co" cols="60" rows="10" wrap="off" style="height: 200px;" id="c2" onblur="check('2')" onkeyup="keyUp()" onFocus="clearValue('2')" onscroll="G('li').scrollTop = this.scrollTop;" oncontextmenu="return false" class="grey"></textarea>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="form-group">
+          <label>域名归类</label>
+          <select class="form-control" id="z_inner">
+            <option value="1">内部域名</option>
+            <option value="2">劫持域名</option>
+            <!-- <option value="0">外部</option> -->
+          </select>
+        </div>
+      </div>
+      <div class="ajax-error hide">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="sub">提交</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="error-modal hide"></p>
+<p class="success-modal hide"></p>
+
+<div id="r_line" style="display : none">
+  {% for text, value in selections.get('z_views').items() %}
+  <p>{{ text }},{{ value }}</p>
+  {% endfor %}
+</div>
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    var z_type_map = new Map();
+    z_type_map.set('forward only', '转发域名');
+    z_type_map.set('master', '主域名');
+    z_type_map.set('salve', '从域名');
+
+    var table = $("#zone_list").DataTable({
+      "bAutoWidth": true, //自动宽度
+      "processing": true,
+      "serverSide": true,
+      "ajax": "{{ url_for('dns.tables_zone', group=request.path.split('/')[-2] ,zone=request.path.split('/')[-1].replace('.', '_')) }}",
+      "language": {
+          "sProcessing":   "处理中...",
+          "sLengthMenu":   "显示 _MENU_ 项结果",
+          "sZeroRecords":  "没有匹配结果",
+          "sInfo":         "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+          "sInfoEmpty":    "显示第 0 至 0 项结果，共 0 项",
+          "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+          "sInfoPostFix":  "",
+          "sSearch":       "搜索:",
+          "sUrl":          "",
+          "sEmptyTable":     "表中数据为空",
+          "sLoadingRecords": "载入中...",
+          "sInfoThousands":  ",",
+          "oPaginate": {
+              "sFirst":    "首页",
+              "sPrevious": "上页",
+              "sNext":     "下页",
+              "sLast":     "末页"
+          },
+          "oAria": {
+              "sSortAscending":  ": 以升序排列此列",
+              "sSortDescending": ": 以降序排列此列"
+          }
+      },
+      responsive: true,
+      "order": [[ 0, "desc" ]],
+      columnDefs: [
+          {
+              targets: 2,
+              render: function ( data, type, row, meta ) {
+                  if(type === 'display'){
+                    // console.log(data)
+                    if (data === 1){
+                      data = '内部域名';
+                    }else if (data === 2){
+                      data = '劫持域名';
+                    }else{
+                      data = '公网域名';
+                    }
+                  }
+                  return data;
+              }
+          },
+          // {
+          //     targets: -3,
+          //     render: function ( data, type, row, meta ) {
+          //         if(type === 'display'){
+          //           console.log(data)
+          //           var data = z_type_map.get(data);
+
+          //         }
+
+          //         return data;
+          //     }
+          // },
+          {
+              targets: -1,
+              render: function ( data, type, row, meta ) {
+                  if(type === 'display'){
+//                     console.log(row)
+                    {% if current_user.admin == 2 %}
+                    data = '<a data-id="' + row[0] + '" onclick="" class="btn btn-link edit" data-toggle="modal" data-target="#myModal"  data-zone="' + row[1] +
+                            '" data-inner="' + row[2] + '" data-type="' + row[3] + '" data-area="' + row[4] + '" data-forwarders="'+ row[5]+'">编辑</a> ' +
+                            '| <button type="button" data-id="' + row[0] + '" class="btn btn-link del"><span class="label label-danger" ><u>删除</u></span></button>'
+                    {% elif current_user.admin == 1 %}
+                    data = '<a data-id=' + row[0] + ' onclick="" class="btn btn-link edit" data-toggle="modal" data-target="#myModal"' +
+                            ' data-zone="' + row[1] + '" data-inner="' + row[2] + '" data-type="' + row[3] + '" data-area="' + row[4] + '" data-forwarders="'+ row[5]+'">编辑</a>'
+                    {% elif current_user.admin == 0 %}
+                    data = ''
+                    {% endif %}
+                      // data = '<a href="basic.php?game=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    // console.log(data)
+                  }
+
+                  return data;
+              }
+          }
+      ],
+  });
+</script>
+<script src="/static/dist/js/jquery-confirm.js"></script>
+<script src="/static/dist/js/text-config.js"></script>
+<script src="/static/dist/js/zone.js"></script>
+{% endblock %}
+

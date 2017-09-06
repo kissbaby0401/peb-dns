@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/dist/css/jquery-confirm.css">
+<link rel="stylesheet" href="/static/dist/css/view/view.css">
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        权限管理
+        <!--<small>Preview</small>-->
+      </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-body">
+                    <table id="all_users" class="table table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>角色</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+        <!-- <div class="col-md-6">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title"> 管理员  ：</h3>
+                    <br>
+                    <br>
+                    <div class="btn-group">
+                        <button id="add_admin" type="button" style="width:120px" class="btn btn-block btn-primary" data-admin="1" data-toggle="modal"  data-target="#add_modal">添加</button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table id="admins" class="table table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> -->
+      </div>
+    </section>
+</div>
+{% endblock %}
+
+
+{% block modal %}
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">创建记录</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>角色</label>
+                    <select type="text" class="form-control" id="role">
+                        <option value="0">guest</option>
+                        <option value="1">管理员</option>
+                        <option value="2">超级管理员</option>
+                    </select>
+                </div>
+            </div>
+            <div class="ajax-error hide">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="sub">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+
+  var all_users = $("#all_users").DataTable({
+      "bAutoWidth": true, //自动宽度 
+      "processing": true,
+      "serverSide": true,
+      "ajax": "{{ url_for('dns.users') }}",
+      "language": {
+          "sProcessing":   "处理中...",
+          "sLengthMenu":   "显示 _MENU_ 项结果",
+          "sZeroRecords":  "没有匹配结果",
+          "sInfo":         "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+          "sInfoEmpty":    "显示第 0 至 0 项结果，共 0 项",
+          "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+          "sInfoPostFix":  "",
+          "sSearch":       "搜索:",
+          "sUrl":          "",
+          "sEmptyTable":     "表中数据为空",
+          "sLoadingRecords": "载入中...",
+          "sInfoThousands":  ",",
+          "oPaginate": {
+              "sFirst":    "首页",
+              "sPrevious": "上页",
+              "sNext":     "下页",
+              "sLast":     "末页"
+          },
+          "oAria": {
+              "sSortAscending":  ": 以升序排列此列",
+              "sSortDescending": ": 以降序排列此列"
+          }
+      },
+      responsive: true,
+      "order": [[ 0, "desc" ]],
+      columnDefs: [
+          {
+              targets: -1,
+              render: function ( data, type, row, meta ) {
+                  if(type === 'display'){
+                    // console.log(row[0])
+                    data = '<button type="button"  data-toggle="modal" data-target="#myModal"  data-role="'+ row[1] +'"data-username=' + row[0] + ' class="btn btn-link edit"><span class="label label-danger"><u>编辑</u></span></button>'
+
+                      // data = '<a href="basic.php?game=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    // console.log(data)
+                  }
+
+                  return data;
+              }
+          },
+          {
+              targets: -2,
+              render: function ( data, type, row, meta ) {
+                  if(type === 'display'){
+                    if (data === 1){
+                      data = '管理员';
+                    }else if (data === 2){
+                      data = '超级管理员';
+                    }else if (data === 0){
+                      data = 'Guest';
+                    }
+                  }
+                  return data;
+              }
+          }
+      ],
+  });
+
+
+//   superadmin_table.ajax.reload();
+
+
+</script>
+<script src="/static/dist/js/jquery-confirm.js"></script>
+<script src="/static/dist/js/admin.js"></script>
+{% endblock %}
+
