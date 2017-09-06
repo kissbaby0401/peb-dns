@@ -223,7 +223,7 @@
                     {% if current_user.admin == 2 %}
                     data = '<a data-id="' + row[0] + '" onclick="" class="btn btn-link edit" data-toggle="modal" data-target="#myModal"  data-zone="' + row[1] +
                             '" data-inner="' + row[2] + '" data-type="' + row[3] + '" data-area="' + row[4] + '" data-forwarders="'+ row[5]+'">编辑</a> ' +
-                            '| <button type="button" data-id="' + row[0] + '" class="btn btn-link del"><span class="label label-danger" ><u>删除</u></span></button>'
+                            '| <button type="button" data-id="' + row[0] + '" data-zone="' + row[1] + '" class="btn btn-link del"><span class="label label-danger" ><u>删除</u></span></button>'
                     {% elif current_user.admin == 1 %}
                     data = '<a data-id=' + row[0] + ' onclick="" class="btn btn-link edit" data-toggle="modal" data-target="#myModal"' +
                             ' data-zone="' + row[1] + '" data-inner="' + row[2] + '" data-type="' + row[3] + '" data-area="' + row[4] + '" data-forwarders="'+ row[5]+'">编辑</a>'

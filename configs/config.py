@@ -41,7 +41,7 @@ config = {
 }
 
 config_pyfiles = {
-    'dev': 'dns_dev.cfg',
-    'prod': 'dns_prod.cfg',
-    'default': 'dns_dev.cfg'
+    'dev': 'configs/dns_dev.cfg',
+    'prod': 'configs/dns_prod.cfg',
+    'default': 'configs/dns_dev.cfg'
 }

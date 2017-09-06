@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint, render_template, request, jsonify
-from config import config, config_pyfiles
+from configs.config import config, config_pyfiles
 import click
 from flask_migrate import Migrate, MigrateCommand
 from .extensions import mail, db, login_manager
@@ -74,7 +74,7 @@ def create_app(config_name='default'):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
     app.config.from_pyfile(config_pyfiles[config_name])
-    app.config.from_pyfile('dns_templates.cfg')
+    app.config.from_pyfile('configs/dns_templates.cfg')
     configure_extensions(app)
     configure_blueprints(app, [auth, dns, main, api])
     configure_error_handlers(app)

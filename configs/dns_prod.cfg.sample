@@ -2,7 +2,7 @@
 
 # 这里配置你自己的 生产环境 mysql 地址， 格式如下
 # mysql+mysqlconnector://<db_username>:<db_password>@<db_ip_address>/<db_name>?charset=utf8
-SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://hfdns_admin:Hfbms_2dm1n@192.168.72.34/hfdns_v2_db?charset=utf8'
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://<db_username>:<db_password>@<db_ip_address>/<db_name>?charset=utf8'
 
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_POOL_SIZE = 10
@@ -13,15 +13,15 @@ SQLALCHEMY_RECORD_QUERIES = True
 
 
 # 前端选项
-TTL_LIST = ['600', '1800', '3600']
-INNER_TYPES = ['A', 'CNAME', 'PTR', 'NS']
-OUTTER_TYPES = ['A', 'CNAME', 'PTR', 'NS', 'TXT']
-SERVER_INIT_CMD = 'df -h;sleep 5;ifconfig'
+TTL_LIST = ['600', '1800', '3600']  # 创建记录时，TTL可选项
+INNER_TYPES = ['A', 'CNAME', 'PTR', 'NS']   #内网域名与拦截域名 线路类型选项
+OUTTER_TYPES = ['A', 'CNAME', 'PTR', 'NS', 'TXT']   #公网域名 线路类型选项
+SERVER_INIT_CMD = 'df -h;sleep 5;ifconfig'  #创建服务器 后台调用DNS服务器初始化脚本
 
 
 
 # ETCD 配置文件
-ETCD_SERVER_HOST = '192.168.72.221'  # ETCD Server IP 地址
+ETCD_SERVER_HOST = '6.6.6.6'  # ETCD Server IP 地址
 ETCD_SERVER_PORT = 2379     # ETCD Server 端口号
 
 ETCD_BASE_DIR = '/opscmdb/dns/etc/named/'  # DNS主要配置文件存放的 根目录
@@ -33,7 +33,7 @@ VIEW_DEFINE_CONF = ETCD_BASE_DIR + 'view_define.conf'    # VIEW 声明配置文�
 
 
 # DNSPOD 配置文件
-DNSPOD_TOKEN = "39314,ce8ab0a89c4555ea37f1a5e470a3faa2"     # DNSPOD token
+DNSPOD_TOKEN = "12345,ce8ab0ac9c4555ea37f1a5xxxxxxxxxx"     # DNSPOD token
 DNSPOD_DATA_FORMAT = "json"             # DNSPOD 数据格式
 DNSPOD_RECORD_BASE_URL = "https://dnsapi.cn/Record."
 DNSPOD_DOMAIN_BASE_URL = "https://dnsapi.cn/Domain."

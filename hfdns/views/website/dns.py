@@ -220,7 +220,9 @@ def zones():
         return render_template('dns/zones.html', inner_zones=inner_zones, intercepted_zones=intercepted_zones, outter_zones=outter_zones, selections = selections)
 
     elif request.method == 'POST':
+        
         req = request.json
+        print(req)
         
         action = req.get('action')
         z_name = req.get('z_name')
@@ -277,7 +279,7 @@ def zones():
             m_zone.z_type = z_type
             m_zone.is_inner = int(z_is_inner)
             m_zone.views = ','.join(z_views)
-            if m_zone.z_type == 'forward only':
+            if z_type == 'forward only':
                 m_zone.forwarders = '; '.join([ip.strip() for ip in z_forwarders.strip().split()]) + ';'
             # m_zone.z_forwarders = z_forwarders.split()
             db.session.add(m_zone)

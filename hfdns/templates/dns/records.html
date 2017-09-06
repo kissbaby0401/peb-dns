@@ -308,7 +308,7 @@ var table = $("#records_list").DataTable({
                 {% if current_user.admin == 2 %}
                 data = '<a data-id=' + row[0]+ ' data-record="'+ row[3] +'" data-host="'+ row[1] +'"  data-recordtype="' + row[2] +'" ' +
                                 'data-ttl="' + row[4] + '" data-line="' + row[5] + '" data-other="' + row[6] + '"'+
-                        'href="javascript:;" class="btn btn-link edit"  data-toggle="modal" data-target="#myModal">编辑</a> | <button type="button" data-id="' + row[0] + '"  class="btn btn-link del"><span class="label label-danger"><u>删除</u></span></button>'
+                        'href="javascript:;" class="btn btn-link edit"  data-toggle="modal" data-target="#myModal">编辑</a> | <button type="button" data-id="' + row[0] + '" data-record="' + row[1] + '" class="btn btn-link del"><span class="label label-danger"><u>删除</u></span></button>'
                 {% elif current_user.admin == 1 %}
                 data =  '<a data-id=' + row[0]+ ' data-record="'+ row[3] +'" data-host="'+ row[1] +'"  data-recordtype="' + row[2] +'" ' +
                         'data-ttl="' + row[4] + '" data-line="' + row[5] + '" data-other="' + row[6] + '"'+
